@@ -2,7 +2,12 @@ const http = require('http');
 const fs = require('fs');
 
 const server = http.createServer((req, res) => {
-  console.log(req);
+
+  fs.readFile('./public/helium.html', (err, heliumFile) => {
+    if (err) throw err;
+    res.write(heliumFile);
+    res.end();
+  });
 });
 
 server.listen(8080,() => {
