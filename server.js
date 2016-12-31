@@ -8,22 +8,38 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'GET' && req.url === '/' || req.url === '/index.html'){
     clientRequestPath =  './public/index.html';
+    fs.readFile(clientRequestPath, (err, file) => {
+    if (err) throw err;
+    res.write(file);
+    res.end();
+  });
   } else if (req.method === 'GET' && req.url === '/helium.html'){
     clientRequestPath =  './public/helium.html';
+    fs.readFile(clientRequestPath, (err, file) => {
+    if (err) throw err;
+    res.write(file);
+    res.end();
+  });
   } else if (req.method === 'GET' && req.url === '/hydrogen.html') {
     clientRequestPath =  './public/hydrogen.html';
+    fs.readFile(clientRequestPath, (err, file) => {
+    if (err) throw err;
+    res.write(file);
+    res.end();
+  });
   } else if (req.method === 'GET' && req.url === '/css/styles.css') {
     clientRequestPath =  './public/css/styles.css';
-  }
-
-
-  if (req.method === 'POST'){
+     fs.readFile(clientRequestPath, (err, file) => {
+    if (err) throw err;
+    res.write(file);
+    res.end();
+  });
+  } else if  (req.method === 'POST'){
 
     //client POST request
     req.on('data', (data) => {
       var clientHeader = querystring.parse(data.toString());
       console.log(clientHeader.elementName);
-      console.log("hi");
 
       //writes a new file
       fs.writeFile(`./public/${clientHeader.elementName}.html`, `<html lang="en">
@@ -52,14 +68,6 @@ const server = http.createServer((req, res) => {
       });
     });
   }
-
-
-  //reads the file
-  fs.readFile(clientRequestPath, (err, file) => {
-    if (err) throw err;
-    res.write(file);
-    res.end();
-  });
 
 });
 
