@@ -3,7 +3,7 @@ const fs = require('fs');
 const querystring = require('querystring');
 
 let clientRequestPath;
-let haveFile = false;
+let pageFound = false;
 
 const server = http.createServer((req, res) => {
   //removes '/' from url
@@ -17,7 +17,9 @@ const server = http.createServer((req, res) => {
       if (err) throw err;
   // checks all files in public directory
     filesInDir.forEach(function(file){
-      if (req.method === "GET" && url === file) {
+      if (url === file) {
+        console.log('1');
+        pageFound = true;
         fs.readFile(`./public/${file}`, (err, file) => {
         if (err) throw err;
         res.writeHead(200, {
@@ -26,7 +28,38 @@ const server = http.createServer((req, res) => {
         res.write(file);
         res.end();
         });
+       } else if (req.url === '/'){
+        pageFound = true;
+        fs.readFile(`./public/index.html`, (err, file) => {
+        if (err) throw err;
+        res.writeHead(200, {
+        'Content-Type': 'text/html',
+        'Content-Length': `${file.length}`});
+        res.write(file);
+        });
        } else if (url === 'css/styles.css'){
+        pageFound = true;
+        fs.readFile('./public/css/styles.css', (err, file) => {
+        if (err) throw err;
+        res.writeHead(200, {
+        'Content-Type': 'text/css',
+        'Content-Length': `${file.length}`});
+        res.write(file);
+        });
+
+
+      }
+    });
+      if(pageFound === false){
+        fs.readFile('./public/404.html', (err, file) => {
+        if (err) throw err;
+        res.writeHead(404, {
+        'Content-Type': 'text/html',
+        'Content-Length': `${file.length}`});
+        res.end(file);
+        });
+      } else if (url === 'css/styles.css'){
+        pageFound = true;
         fs.readFile('./public/css/styles.css', (err, file) => {
         if (err) throw err;
         res.writeHead(200, {
@@ -35,9 +68,7 @@ const server = http.createServer((req, res) => {
         res.write(file);
         });
       }
-    });
   });
-
 
 
 //   if (req.method === 'GET' && req.url === '/' || req.url === '/index.html'){
