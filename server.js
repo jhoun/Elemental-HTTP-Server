@@ -7,18 +7,28 @@ let fileType;
 
 const server = http.createServer((req, res) => {
   //removes '/' from url
-  var url = req.url.substring(1);
   var findCss = req.url.split('').splice(-3, 3).join('');
 
   if(findCss === 'css'){
     fileType = 'css';
-  } else {
+  } else  {
     fileType = 'html';
   }
 
-  fs.readFile(`./public/${url}`, (err, file) => {
-    console.log(fileType);
-    if (err) {
+
+  //checks to see if we have this file
+  fs.readFile(`./public${req.url}`, (err, file) => {
+    //if we don't, then throw custom error
+  if (req.url === "/"){
+    fs.readFile('./public/index.html', (err, file) => {
+      if (err) throw err;
+      res.writeHead(404, {
+      'Content-Type': 'text/html',
+      'Content-Length': `${file.length}`});
+      res.write(file);
+      res.end()
+    });
+  } else if (err) {
       fs.readFile('./public/404.html', (err, file) => {
         if (err) throw err;
         res.writeHead(404, {
@@ -27,8 +37,9 @@ const server = http.createServer((req, res) => {
         res.write(file);
         res.end()
       });
-    } else {
-      fs.readFile(`./public/${url}`, (err, file) => {
+    //if we do have the file, write it back to client
+    } else if (file) {
+      fs.readFile(`./public${req.url}`, (err, file) => {
         if (err) throw err;
         res.writeHead(200, {
         'Content-Type': `text/${fileType}`,
@@ -37,7 +48,6 @@ const server = http.createServer((req, res) => {
         res.end();
       });
     }
-
   });
 
 
@@ -49,7 +59,7 @@ const server = http.createServer((req, res) => {
 //     for (var i = 0; i < filesInDir.length; i++){
 
 //       if (url === filesInDir[i]) {
-//         fs.readFile(`./public/${filesInDir[i]}`, (err, file) => {
+//         fs.readFile(` ./public/${filesInDir[i]}`, (err, file) => {
 //         fileFound = true;
 //         if (err) throw err;
 //         res.writeHead(200, {
