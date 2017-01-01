@@ -10,15 +10,14 @@ const server = http.createServer((req, res) => {
 
   var url = req.url.substring(1);
 
-            console.log(url);
 
-  //Pushes all files in public directory into array
+  // Pushes all files in public directory into array
     fs.readdir('./public', (err, filesInDir) => {
       if (err) throw err;
   // checks all files in public directory
     filesInDir.forEach(function(file){
+
       if (url === file) {
-        console.log('1');
         pageFound = true;
         fs.readFile(`./public/${file}`, (err, file) => {
         if (err) throw err;
@@ -28,6 +27,7 @@ const server = http.createServer((req, res) => {
         res.write(file);
         res.end();
         });
+
        } else if (req.url === '/'){
         pageFound = true;
         fs.readFile(`./public/index.html`, (err, file) => {
@@ -37,6 +37,7 @@ const server = http.createServer((req, res) => {
         'Content-Length': `${file.length}`});
         res.write(file);
         });
+
        } else if (url === 'css/styles.css'){
         pageFound = true;
         fs.readFile('./public/css/styles.css', (err, file) => {
@@ -46,10 +47,10 @@ const server = http.createServer((req, res) => {
         'Content-Length': `${file.length}`});
         res.write(file);
         });
-
-
       }
     });
+
+      //error 404
       if(pageFound === false){
         fs.readFile('./public/404.html', (err, file) => {
         if (err) throw err;
@@ -70,6 +71,11 @@ const server = http.createServer((req, res) => {
       }
   });
 
+});
+
+server.listen(8080,() => {
+  console.log('opened server on', server.address());
+});
 
 //   if (req.method === 'GET' && req.url === '/' || req.url === '/index.html'){
 //     clientRequestPath =  './public/index.html';
@@ -134,9 +140,3 @@ const server = http.createServer((req, res) => {
 //     });
   // }
 
-
-});
-
-server.listen(8080,() => {
-  console.log('opened server on', server.address());
-});
