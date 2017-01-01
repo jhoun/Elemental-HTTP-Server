@@ -2,14 +2,22 @@ const http = require('http');
 const fs = require('fs');
 const querystring = require('querystring');
 
-let clientRequestPath;
+let fileType;
+
 
 const server = http.createServer((req, res) => {
   //removes '/' from url
-
   var url = req.url.substring(1);
+  var findCss = req.url.split('').splice(-3, 3).join('');
+
+  if(findCss === 'css'){
+    fileType = 'css';
+  } else {
+    fileType = 'html';
+  }
 
   fs.readFile(`./public/${url}`, (err, file) => {
+    console.log(fileType);
     if (err) {
       fs.readFile('./public/404.html', (err, file) => {
         if (err) throw err;
@@ -23,7 +31,7 @@ const server = http.createServer((req, res) => {
       fs.readFile(`./public/${url}`, (err, file) => {
         if (err) throw err;
         res.writeHead(200, {
-        'Content-Type': 'text/html',
+        'Content-Type': `text/${fileType}`,
         'Content-Length': `${file.length}`});
         res.write(file);
         res.end();
