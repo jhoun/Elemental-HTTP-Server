@@ -4,7 +4,6 @@ const querystring = require('querystring');
 const PORT = 8080;
 
 const server = http.createServer((req, res) => {
-  console.log(req.url);
   let fileType;
   let findCss = req.url.split('').splice(-3, 3).join('');
 
@@ -36,7 +35,7 @@ const forwardSlashCheck = () => {
     if (req.url === "/"){
       forwardSlashCheck();
     } else if (req.method === 'POST') {
-      console.log('this file does not exists, so we are gonna make one');
+      console.log('this file does not exists, so we are gonna make one =)');
 
       // client POST request
       req.on('data', (data) => {
@@ -51,12 +50,12 @@ const forwardSlashCheck = () => {
 <body>
   <h1>${clientHeaderName}</h1>
   <h2>${clientHeader.elementSymbol}</h2>
-  <h3>Atomic number ${clientHeader.elementAtomicNumber}</h3>
+  <h3>Atomic number: ${clientHeader.elementAtomicNumber}</h3>
   <p>${clientHeader.elementDescription}</p>
   <p><a href="/">back</a></p>
 </body>
 </html>`
-      console.log('client wants: ',clientHeader.elementName);
+      console.log('client wants: ',clientHeaderName);
 
       //creates the requested file and html input
       fs.writeFile(`./public/${clientHeaderName}.html`, htmlTemplate, (err) => {
@@ -67,7 +66,8 @@ const forwardSlashCheck = () => {
           //reads it back out to client
             fs.readFile(clientRequestPath, (err, file) => {
               if (err) throw err;
-              res.write(file);
+              res.writeHead(200, {'Content-Type' : 'application/json'});
+              res.write(`{ "success" : true }`);
               res.end();
             });
         });
@@ -87,7 +87,7 @@ const forwardSlashCheck = () => {
           res.end()
         });
         //if we do have the file, write it back to client
-        } else if (file) {
+        } else {
           fs.readFile(`./public${req.url}`, (err, file) => {
             if (err) throw err;
             res.writeHead(200, {
