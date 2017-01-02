@@ -10,11 +10,16 @@ const server = http.createServer((req, res) => {
   //removes '/' from url
   var findCss = req.url.split('').splice(-3, 3).join('');
 
+
+function cssCheck(){
   if(findCss === 'css'){
     fileType = 'css';
+    return fileType;
   } else  {
     fileType = 'html';
+    return fileType;
   }
+}
 
 // checks to see if we have the file in our directory
 fs.readFile(`./public${req.url}`, (err) => {
@@ -89,7 +94,7 @@ fs.readFile(`./public${req.url}`, (err) => {
       fs.readFile(`./public${req.url}`, (err, file) => {
         if (err) throw err;
         res.writeHead(200, {
-        'Content-Type': `text/${fileType}`,
+        'Content-Type': `text/${cssCheck()}`,
         'Content-Length': `${file.length}`});
         res.write(file);
         res.end();
