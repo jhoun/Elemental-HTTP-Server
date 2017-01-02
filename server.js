@@ -1,17 +1,15 @@
 const http = require('http');
 const fs = require('fs');
 const querystring = require('querystring');
-
-let fileType;
-
+const PORT = 8080;
 
 const server = http.createServer((req, res) => {
   console.log(req.url);
-  //removes '/' from url
-  var findCss = req.url.split('').splice(-3, 3).join('');
+  let fileType;
+  let findCss = req.url.split('').splice(-3, 3).join('');
 
 
-function cssCheck(){
+const cssCheck = () => {
   if(findCss === 'css'){
     fileType = 'css';
     return fileType;
@@ -19,11 +17,9 @@ function cssCheck(){
     fileType = 'html';
     return fileType;
   }
-}
+};
 
-// checks to see if we have the file in our directory
-fs.readFile(`./public${req.url}`, (err) => {
-  if (req.url === "/"){
+const forwardSlashCheck = () => {
     fs.readFile('./public/index.html', (err, file) => {
       if (err) throw err;
       res.writeHead(200, {
@@ -32,6 +28,13 @@ fs.readFile(`./public${req.url}`, (err) => {
       res.write(file);
       res.end()
     });
+};
+
+
+// checks to see if we have the file in our directory
+fs.readFile(`./public${req.url}`, (err) => {
+  if (req.url === "/"){
+    forwardSlashCheck();
   } else if (err) {
     console.log('this file does not exists, so we are gonna make one');
 
@@ -70,16 +73,8 @@ fs.readFile(`./public${req.url}`, (err) => {
   } else {
   //checks to see if we have this file
   fs.readFile(`./public${req.url}`, (err, file) => {
-    //if we don't, then throw custom error
   if (req.url === "/"){
-    fs.readFile('./public/index.html', (err, file) => {
-      if (err) throw err;
-      res.writeHead(200, {
-      'Content-Type': 'text/html',
-      'Content-Length': `${file.length}`});
-      res.write(file);
-      res.end()
-    });
+    forwardSlashCheck();
   } else if (err) {
       fs.readFile('./public/404.html', (err, file) => {
         if (err) throw err;
@@ -107,7 +102,7 @@ fs.readFile(`./public${req.url}`, (err) => {
 
 });
 
-server.listen(8080,() => {
+server.listen(PORT => {
   console.log('opened server on', server.address());
 });
 
