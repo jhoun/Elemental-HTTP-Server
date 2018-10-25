@@ -1,47 +1,51 @@
 const http = require('http');
 const fs = require('fs');
 const querystring = require('querystring');
-const PORT = 8080;
+const PORT = 8081;
 
-const server = http.createServer((req, res) => {
-  let fileType;
-  let findCss = req.url.split('').splice(-3, 3).join('');
-
-
-const cssCheck = () => {
-  if(findCss === 'css'){
-    fileType = 'css';
-    return fileType;
-  } else  {
-    fileType = 'html';
-    return fileType;
-  }
-};
-
-const forwardSlashCheck = () => {
+const forwardSlashCheck = data => {
   fs.readFile('./public/index.html', (err, file) => {
     if (err) throw err;
-    res.writeHead(200, {
-    'Content-Type': 'text/html',
-    'Content-Length': `${file.length}`});
-    res.write(file);
-    res.end()
+    data.writeHead(200, {
+      'Content-Type': 'text/html',
+      'Content-Length': `${file.length}`
+    });
+    data.write(file);
+    data.end();
   });
 };
 
+const server = http.createServer((req, res) => {
+  let fileType;
+  console.log('req.url', req.url);
+  let findCss = req.url
+    .split('')
+    .splice(-3, 3)
+    .join('');
+  console.log('findCss', findCss);
 
-// checks to see if we have the file in our directory
+  const cssCheck = () => {
+    if (findCss === 'css') {
+      fileType = 'css';
+      return fileType;
+    } else {
+      fileType = 'html';
+      return fileType;
+    }
+  };
+
+  // checks to see if we have the file in our directory
   fs.readFile(`./public${req.url}`, () => {
-    if (req.url === "/"){
-      forwardSlashCheck();
+    if (req.url === '/') {
+      forwardSlashCheck(res);
     } else if (req.method === 'POST') {
-      console.log('this file does not exists, so we are gonna make one =)');
+      console.log('this file does not exists, so we are gonna make one');
 
       // client POST request
-      req.on('data', (data) => {
-      let clientHeader = querystring.parse(data.toString());
-      let clientHeaderName = clientHeader.elementName;
-      let htmlTemplate = `<html lang="en">
+      req.on('data', data => {
+        let clientHeader = querystring.parse(data.toString());
+        let clientHeaderName = clientHeader.elementName;
+        let htmlTemplate = `<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>The Elements - ${clientHeaderName}</title>
@@ -54,45 +58,47 @@ const forwardSlashCheck = () => {
   <p>${clientHeader.elementDescription}</p>
   <p><a href="/">back</a></p>
 </body>
-</html>`
-      console.log('client wants: ',clientHeaderName);
+</html>`;
+        console.log('client wants: ', clientHeaderName);
 
-      //creates the requested file and html input
-      fs.writeFile(`./public/${clientHeaderName}.html`, htmlTemplate, (err) => {
+        //creates the requested file and html input
+        fs.writeFile(`./public/${clientHeaderName}.html`, htmlTemplate, err => {
           if (err) throw err;
           //creates new path
-          clientRequestPath =  `./public/${clientHeaderName}.html`;
-          console.log('It\'s saved!');
+          clientRequestPath = `./public/${clientHeaderName}.html`;
+          console.log("It's saved!");
           //reads it back out to client
-            fs.readFile(clientRequestPath, (err, file) => {
-              if (err) throw err;
-              res.writeHead(200, {'Content-Type' : 'application/json'});
-              res.write(`{ "success" : true }`);
-              res.end();
-            });
+          fs.readFile(clientRequestPath, (err, file) => {
+            if (err) throw err;
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.write(`{ "success" : true }`);
+            res.end();
+          });
         });
       });
     } else {
       //checks to see if we have this file
       fs.readFile(`./public${req.url}`, (err, file) => {
-      if (req.url === "/"){
-        forwardSlashCheck();
-      } else if (err) {
-        fs.readFile('./public/404.html', (err, file) => {
-          if (err) throw err;
-          res.writeHead(404, {
-          'Content-Type': 'text/html',
-          'Content-Length': `${file.length}`});
-          res.write(file);
-          res.end()
-        });
-        //if we do have the file, write it back to client
+        if (req.url === '/') {
+          forwardSlashCheck();
+        } else if (err) {
+          fs.readFile('./public/404.html', (err, file) => {
+            if (err) throw err;
+            res.writeHead(404, {
+              'Content-Type': 'text/html',
+              'Content-Length': `${file.length}`
+            });
+            res.write(file);
+            res.end();
+          });
+          //if we do have the file, write it back to client
         } else {
           fs.readFile(`./public${req.url}`, (err, file) => {
             if (err) throw err;
             res.writeHead(200, {
-            'Content-Type': `text/${cssCheck()}`,
-            'Content-Length': `${file.length}`});
+              'Content-Type': `text/${cssCheck()}`,
+              'Content-Length': `${file.length}`
+            });
             res.write(file);
             res.end();
           });
@@ -103,6 +109,5 @@ const forwardSlashCheck = () => {
 });
 
 server.listen(PORT, () => {
-  console.log('opened server on', server.address());
+  console.log('Opened server on', server.address());
 });
-

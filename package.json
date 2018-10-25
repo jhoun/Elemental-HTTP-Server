@@ -18,12 +18,5 @@
     "url": "https://github.com/jhoun/Elemental-HTTP-Server/issues"
   },
   "homepage": "https://github.com/jhoun/Elemental-HTTP-Server#readme"
-},
-"xo": {
-    "esnext": true,
-    "space": true,
-    "globals": [
-      "window"
-    ]
-  }
+}
 
