@@ -1,20 +1,10 @@
 module.exports = {
   createHeader: (req, res, data, statusCode) => {
-    let type;
-    let findCss = req.url
-      .split('')
-      .splice(-3, 3)
-      .join('');
-
-    if (findCss === 'css') {
-      type = 'css';
-    } else {
-      type = 'html';
-    }
-
+    let isCss = req.url.slice(-3);
     res.writeHead(statusCode, {
-      'Content-Type': `text/${type}`,
+      'Content-Type': `text/${isCss === 'css' ? 'css' : 'html'}`,
       'Content-Length': `${data.length}`
     });
+    res.write(data);
   }
 };
