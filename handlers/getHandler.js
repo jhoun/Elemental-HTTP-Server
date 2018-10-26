@@ -1,7 +1,7 @@
 const fs = require('fs').promises;
 const helper = require('../util/helper.js');
 
-module.exports = async function getHandler(req, res) {
+module.exports = async (req, res) => {
   // Checks if you are on home route
   if (req.url === '/') {
     try {
