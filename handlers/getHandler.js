@@ -1,5 +1,5 @@
 const fs = require('fs').promises;
-const helper = require('../util/helper.js');
+const {createHeader} = require('../util/helper.js');
 
 module.exports = async (req, res) => {
   // Checks if you are on home route
@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
   } else {
     try {
       const data = await fs.readFile(`./public/${req.url.slice(1)}`);
-      helper.createHeader(req, res, data, 200);
+      createHeader(req, res, data, 200);
     } catch (err) {
       try {
         const data = await fs.readFile('./public/404.html');
